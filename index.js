@@ -44,12 +44,11 @@ app.get('/items', function(req, res){
     //excercise for hw
     //use .map() hof to convert every item in db array to simpler copy of only has the asterisked items
 
-    /*let simplifiedDB = db.map(function(item, index){
-        //*********************** 
-        //write code that will convert item(with all details) to simpler copy
-        db.filter(db => db.id === parseInt(req.params.id));
-    })*/
-    let simplifiedDB = db.map(db => ({'id': db.id, 'label': db.label, 'done': db.done}));
+    let simplifiedDB = db.map(db => ({
+        'id': db.id, 
+        'label': db.label, 
+        'done': db.done
+    }));
     console.log(simplifiedDB);
     res.json(simplifiedDB);
     //res.json(db);
@@ -59,7 +58,8 @@ app.get('/items', function(req, res){
 app.get('/items/:id', function(req, res){
     console.log('Get /items/', req.params)
 
-    let id = req.params.id;
+    //need parseInt for it to work
+    let id = parseInt(req.params.id);
 
     let found = db.find(item=> item.id === id)  
 
@@ -86,7 +86,7 @@ app.post('/items', function(req, res){
     }
 
     db.push(dataIn);
-    res.sendStatus(204);
+    res.send('new item posted');
 
 
 })
@@ -99,14 +99,43 @@ app.post('/items', function(req, res){
 app.put('/items/:id', function(req, res){
     console.log('PUT /items/', req.body);
 
-    let putDataIn = req.body;
+    let dataIn = req.body;
+    let id = req.params.id;
 
+    let found = db.find(db => db.id == id);
+
+    //override id if they entered one in body
+    dataIn.id = id;
+
+    if(!dataIn.label){
+        dataIn.label = found.label
+    }
+
+    //Mark item as not done if anything but true is sent in
+    if(dataIn.done !=true){
+        dataIn.done = false;
+    }
+    
+    console.log(dataIn);
+
+    // update the item in the database
+    let updatedItem = db.findIndex(item => item.id == id);
+    db.splice(updatedItem, 1, dataIn);
+
+    res.send('updated');
 })
 
 //DELETE  /items/:id
 //find the item with the id in the db and remove it
 app.delete('/items/:id', function(req, res){
-    console.log('DELETE /items/:id', req.body)
+    console.log('DELETE /items/:id', req.params.id);
+
+    let id = parseInt(req.params.id);
+    // find the index of the item to be deleted from the list
+    let itemIdx = db.findIndex(item => item.id == id);
+    //remove the item from the list
+    db.splice(itemIdx, 1);
+    console.log(db);
     res.send('deleted');
 })
 
