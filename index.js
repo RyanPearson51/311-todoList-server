@@ -115,8 +115,6 @@ app.put('/items/:id', function(req, res){
     if(dataIn.done !=true){
         dataIn.done = false;
     }
-    
-    console.log(dataIn);
 
     // update the item in the database
     let updatedItem = db.findIndex(item => item.id == id);
