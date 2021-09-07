@@ -133,7 +133,6 @@ app.delete('/items/:id', function(req, res){
     let itemIdx = db.findIndex(item => item.id == id);
     //remove the item from the list
     db.splice(itemIdx, 1);
-    console.log(db);
     res.send('deleted');
 })
 
